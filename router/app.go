@@ -14,8 +14,15 @@ func Router() *gin.Engine {
 	//Swagger 配置
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	// 路由规则
-	r.GET("/ping", service.Ping)
+
+	// problem
 	r.GET("/problem-list", service.GetProblemList)
 	r.GET("/problem-detail", service.GetProblemDetail)
+
+	// user
+	r.GET("/user-detail", service.GetUserDetail)
+
+	//submission
+	r.GET("/submit-list", service.GetSubmitList)
 	return r
 }
