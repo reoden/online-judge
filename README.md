@@ -10,3 +10,8 @@ GetProblemList
 // @Success 200 {string} json "{"code":"200","msg","","data":""}"
 // @Router /problem-list [get]
 ```
+
+## 安装JWT
+```shell
+go get github.com/dgrijalva/jwt-go
+```

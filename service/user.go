@@ -1,8 +1,11 @@
 package service
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
+	"online-judge/helper"
 	"online-judge/models"
 )
 
@@ -34,5 +37,57 @@ func GetUserDetail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": 200,
 		"data": data,
+	})
+}
+
+// Login
+// @Tags 公共方法
+// @Summary 用户登录
+// @Param username formData string false "username"
+// @Param password formData string false "password"
+// @Success 200 {string} json "{"code":"200","data":""}"
+// @Router /login [post]
+func Login(ctx *gin.Context) {
+	username := ctx.PostForm("username")
+	password := ctx.PostForm("password")
+	if username == "" || password == "" {
+		ctx.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "必填信息为空",
+		})
+	}
+	password = helper.GetMd5(password)
+	//utils.DPrintf("username = %s, password = %s\n", username, password)
+	//print(username, password)
+	data := new(models.UserBasic)
+	err := models.DB.Where("name = ? AND password = ? ", username, password).First(&data).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusOK, gin.H{
+				"code": -1,
+				"msg":  "用户名或密码错误",
+			})
+		} else {
+			ctx.JSON(http.StatusOK, gin.H{
+				"code": -1,
+				"msg":  "Get UserBasic Error:" + err.Error(),
+			})
+		}
+		return
+	}
+
+	token, err := helper.GenerateToken(data.Identity, data.Name)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "Generate Token Error:" + err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"data": map[string]interface{}{
+			"token": token,
+		},
 	})
 }
