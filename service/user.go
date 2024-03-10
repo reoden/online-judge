@@ -80,7 +80,7 @@ func Login(ctx *gin.Context) {
 		return
 	}
 
-	token, err := helper.GenerateToken(data.Identity, data.Name)
+	token, err := helper.GenerateToken(data.Identity, data.Name, data.IsAdmin)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"code": -1,
@@ -139,31 +139,31 @@ func SendCode(ctx *gin.Context) {
 // @Param phone formData string false "phone"
 // @Success 200 {string} json "{"code":"200","data":""}"
 // @Router /register [post]
-func Register(c *gin.Context) {
-	email := c.PostForm("email")
-	userCode := c.PostForm("code")
-	name := c.PostForm("name")
-	password := c.PostForm("password")
-	phone := c.PostForm("phone")
+func Register(ctx *gin.Context) {
+	email := ctx.PostForm("email")
+	userCode := ctx.PostForm("code")
+	name := ctx.PostForm("name")
+	password := ctx.PostForm("password")
+	phone := ctx.PostForm("phone")
 	if email == "" || userCode == "" || name == "" || password == "" {
-		c.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"code": -1,
 			"msg":  "参数不正确",
 		})
 		return
 	}
 	// 验证验证码是否正确
-	sysCode, err := models.RDB.Get(c, email).Result()
+	sysCode, err := models.RDB.Get(ctx, email).Result()
 	if err != nil {
 		log.Printf("Get Code Error:%v \n", err)
-		c.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"code": -1,
 			"msg":  "验证码不正确，请重新获取验证码",
 		})
 		return
 	}
 	if sysCode != userCode {
-		c.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"code": -1,
 			"msg":  "验证码不正确",
 		})
@@ -173,14 +173,14 @@ func Register(c *gin.Context) {
 	var cnt int64
 	err = models.DB.Where("email = ?", email).Model(new(models.UserBasic)).Count(&cnt).Error
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"code": -1,
 			"msg":  "Get User Error:" + err.Error(),
 		})
 		return
 	}
 	if cnt > 0 {
-		c.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"code": -1,
 			"msg":  "该邮箱已被注册",
 		})
@@ -198,7 +198,7 @@ func Register(c *gin.Context) {
 	}
 	err = models.DB.Create(data).Error
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"code": -1,
 			"msg":  "Crete User Error:" + err.Error(),
 		})
@@ -206,15 +206,15 @@ func Register(c *gin.Context) {
 	}
 
 	// 生成 token
-	token, err := helper.GenerateToken(userIdentity, name)
+	token, err := helper.GenerateToken(userIdentity, name, data.IsAdmin)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"code": -1,
 			"msg":  "Generate Token Error:" + err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"code": 200,
 		"data": map[string]interface{}{
 			"token": token,

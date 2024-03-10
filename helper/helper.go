@@ -7,7 +7,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jordan-wright/email"
 	uuid "github.com/satori/go.uuid"
-	"log"
 	"math/rand"
 	"net/smtp"
 	"strconv"
@@ -23,16 +22,18 @@ func GetMd5(s string) string {
 type UserClaims struct {
 	Identity string `json:"Identity"`
 	Name     string `json:"name"`
+	IsAdmin  int    `json:"is_admin"`
 	jwt.StandardClaims
 }
 
 var myKey = []byte("gin-gorm-oj-key")
 
 // GenerateToken 生成Token
-func GenerateToken(identity, name string) (string, error) {
+func GenerateToken(identity, name string, isAdmin int) (string, error) {
 	userClaims := &UserClaims{
 		Identity:       identity,
 		Name:           name,
+		IsAdmin:        isAdmin,
 		StandardClaims: jwt.StandardClaims{},
 	}
 
@@ -53,7 +54,6 @@ func AnalyseToken(token string) (*UserClaims, error) {
 		return myKey, nil
 	})
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 

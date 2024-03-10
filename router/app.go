@@ -5,6 +5,7 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	_ "online-judge/docs"
+	"online-judge/middlewares"
 	"online-judge/service"
 )
 
@@ -15,6 +16,7 @@ func Router() *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	// 路由规则
 
+	// 公用方法
 	// problem
 	r.GET("/problem-list", service.GetProblemList)
 	r.GET("/problem-detail", service.GetProblemDetail)
@@ -29,5 +31,8 @@ func Router() *gin.Engine {
 	r.GET("/rank-list", service.GetRankList)
 	//submission
 	r.GET("/submit-list", service.GetSubmitList)
+
+	// 私有方法
+	r.POST("/problem-create", middlewares.AuthAdminCheck(), service.ProblemCreate)
 	return r
 }

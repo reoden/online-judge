@@ -11,6 +11,7 @@ type UserBasic struct {
 	Email        string `gorm:"column:email;type:varchar(100);" json:"email"`
 	AcNumber     int64  `gorm:"column:ac_number;type:int(11);" json:"ac_number"`
 	SubmitNumber int64  `gorm:"column:submit_number;type:int(11);" json:"submit_number"`
+	IsAdmin      int    `gorm:"column:is_admin;type:tinyint(1);" json:"is_admin"` //[0: false, 1: true]
 }
 
 func (table *UserBasic) TableName() string {

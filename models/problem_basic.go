@@ -15,8 +15,9 @@ type ProblemBasic struct {
 	// 文章正文
 	Content string `gorm:"column:content;type:text;" json:"content"`
 	//最大运行时间
-	MaxRunTime int `gorm:"column:max_runtime;type:int(11);" json:"max_runtime"`
-	MaxMem     int `gorm:"column:max_mem;type:int(11);" json:"max_mem"`
+	MaxRunTime int         `gorm:"column:max_runtime;type:int(11);" json:"max_runtime"`
+	MaxMem     int         `gorm:"column:max_mem;type:int(11);" json:"max_mem"`
+	TestCases  []*TestCase `gorm:"foreignKey:problem_identity;references:identity"`
 }
 
 func (table *ProblemBasic) TableName() string {
