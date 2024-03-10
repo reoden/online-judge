@@ -23,25 +23,20 @@ import (
 // @Success 200 {string} json "{"code":"200","data":""}"
 // @Router /problem-list [get]
 func GetProblemList(ctx *gin.Context) {
+	size, _ := strconv.Atoi(ctx.DefaultQuery("size", define.DefaultSize))
 	page, err := strconv.Atoi(ctx.DefaultQuery("page", define.DefaultPage))
 	if err != nil {
 		log.Println("Get Problem List Page strconv Error:", err)
 		return
 	}
-	// page == 1 ===> offset 0base
-	size, err := strconv.Atoi(ctx.DefaultQuery("size", define.DefaultSize))
-	if err != nil {
-		log.Println("Get Problem List size strconv Error:", err)
-		return
-	}
-
+	var count int64
+	list := make([]*models.ProblemBasic, 0)
 	page = (page - 1) * size
+
 	keyword := ctx.Query("keyword")
 	categoryIdentity := ctx.Query("category_identity")
 	tx := models.GetProblemList(keyword, categoryIdentity)
 
-	list := make([]*models.ProblemBasic, 0)
-	var count int64
 	err = tx.Count(&count).Omit("content").Offset(page).Limit(size).Find(&list).Error
 	if err != nil {
 		log.Println("Get Problem List Error:", err)
