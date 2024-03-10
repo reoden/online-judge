@@ -6,8 +6,10 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"online-judge/define"
 	"online-judge/helper"
 	"online-judge/models"
+	"strconv"
 	"time"
 )
 
@@ -216,6 +218,43 @@ func Register(c *gin.Context) {
 		"code": 200,
 		"data": map[string]interface{}{
 			"token": token,
+		},
+	})
+}
+
+// GetRankList
+// @Tags 公共方法
+// @Summary 用户排行榜
+// @Param page query int false "page"
+// @Param size query int false "size"
+// @Success 200 {string} json "{"code":"200","data":""}"
+// @Router /rank-list [get]
+func GetRankList(ctx *gin.Context) {
+	size, _ := strconv.Atoi(ctx.DefaultQuery("size", define.DefaultSize))
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", define.DefaultPage))
+	if err != nil {
+		log.Println("Get Problem List Page strconv Error:", err)
+		return
+	}
+	var count int64
+	page = (page - 1) * size
+	list := make([]*models.UserBasic, 0)
+
+	err = models.DB.Model(new(models.UserBasic)).Count(&count).Order("ac_number DESC, submit_number ASC").
+		Offset(page).Limit(size).Find(&list).Error
+
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "Get Rank List Error" + err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"data": map[string]interface{}{
+			"list":  list,
+			"count": count,
 		},
 	})
 }
