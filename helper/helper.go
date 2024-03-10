@@ -8,7 +8,10 @@ import (
 	"github.com/jordan-wright/email"
 	uuid "github.com/satori/go.uuid"
 	"log"
+	"math/rand"
 	"net/smtp"
+	"strconv"
+	"time"
 )
 
 // GetMd5 生成md5
@@ -70,6 +73,14 @@ func SendCode(toUserEmail, code string) error {
 	e.HTML = []byte("<b>" + code + "</b>")
 	return e.SendWithTLS("smtp.163.com:465", smtp.PlainAuth("", "staraino_o@163.com", "SIYICTUUUKWYNGKO", "smtp.163.com"),
 		&tls.Config{ServerName: "smtp.163.com", InsecureSkipVerify: true})
+}
+
+func GenerateCode() (code string) {
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < 6; i++ {
+		code += strconv.Itoa(rand.Intn(10))
+	}
+	return
 }
 
 // GetUUID 生成唯一码

@@ -110,7 +110,7 @@ func SendCode(ctx *gin.Context) {
 		return
 	}
 
-	code := "123456"
+	code := helper.GenerateCode()
 	models.RDB.Set(ctx, email, code, time.Second*300)
 	err := helper.SendCode(email, code)
 	if err != nil {
