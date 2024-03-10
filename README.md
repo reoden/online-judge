@@ -15,3 +15,8 @@ GetProblemList
 ```shell
 go get github.com/dgrijalva/jwt-go
 ```
+
+## 验证Email
+```shell
+go get github.com/jordan-wright/email
+```

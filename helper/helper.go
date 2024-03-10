@@ -2,9 +2,13 @@ package helper
 
 import (
 	"crypto/md5"
+	"crypto/tls"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/jordan-wright/email"
+	uuid "github.com/satori/go.uuid"
 	"log"
+	"net/smtp"
 )
 
 // GetMd5 生成md5
@@ -56,4 +60,19 @@ func AnalyseToken(token string) (*UserClaims, error) {
 		return nil, fmt.Errorf("analyse token Error: %w", err)
 	}
 	return userClaim, nil
+}
+
+func SendCode(toUserEmail, code string) error {
+	e := email.NewEmail()
+	e.From = "Get <staraino_o@163.com>"
+	e.To = []string{toUserEmail}
+	e.Subject = "发送验证码"
+	e.HTML = []byte("<b>" + code + "</b>")
+	return e.SendWithTLS("smtp.163.com:465", smtp.PlainAuth("", "staraino_o@163.com", "SIYICTUUUKWYNGKO", "smtp.163.com"),
+		&tls.Config{ServerName: "smtp.163.com", InsecureSkipVerify: true})
+}
+
+// GetUUID 生成唯一码
+func GetUUID() string {
+	return uuid.NewV4().String()
 }
