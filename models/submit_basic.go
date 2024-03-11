@@ -10,7 +10,7 @@ type SubmitBasic struct {
 	UserIdentity    string        `gorm:"column:user_identity;type:varchar(36);" json:"user_identity"`
 	UserBasic       *UserBasic    `gorm:"foreignKey:identity;references:user_identity"` //关联用户基础表
 	Path            string        `gorm:"column:path;type:varchar(255);" json:"path"`
-	Status          int           `gorm:"column:status;type:tinyint(1);" json:"status"` //[-1-pending, 1-ac, 2-wa, 3-tle, 4-mle]
+	Status          int           `gorm:"column:status;type:tinyint(1);" json:"status"` //[-1-pending, 1-ac, 2-wa, 3-tle, 4-mle ,5-ce]
 }
 
 func (table *SubmitBasic) TableName() string {

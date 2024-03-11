@@ -15,9 +15,11 @@ type ProblemBasic struct {
 	// 文章正文
 	Content string `gorm:"column:content;type:text;" json:"content"`
 	//最大运行时间
-	MaxRunTime int         `gorm:"column:max_runtime;type:int(11);" json:"max_runtime"`
-	MaxMem     int         `gorm:"column:max_mem;type:int(11);" json:"max_mem"`
-	TestCases  []*TestCase `gorm:"foreignKey:problem_identity;references:identity"`
+	MaxRunTime   int         `gorm:"column:max_runtime;type:int(11);" json:"max_runtime"`
+	MaxMem       int         `gorm:"column:max_mem;type:int(11);" json:"max_mem"`
+	TestCases    []*TestCase `gorm:"foreignKey:problem_identity;references:identity"`
+	AcNumber     int64       `gorm:"column:ac_number;type:int(11);" json:"ac_number"`
+	SubmitNumber int64       `gorm:"column:submit_number;type:int(11);" json:"submit_number"`
 }
 
 func (table *ProblemBasic) TableName() string {

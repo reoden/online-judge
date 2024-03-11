@@ -9,6 +9,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"math/rand"
 	"net/smtp"
+	"os"
 	"strconv"
 	"time"
 )
@@ -86,4 +87,20 @@ func GenerateCode() (code string) {
 // GetUUID 生成唯一码
 func GetUUID() string {
 	return uuid.NewV4().String()
+}
+
+func CodeSave(code []byte) (string, error) {
+	dirName := "code/" + GetUUID()
+	path := dirName + "/main.go"
+	err := os.Mkdir(dirName, 0777)
+	if err != nil {
+		return "", err
+	}
+	f, err := os.Create(path)
+	if err != nil {
+		return "", err
+	}
+	f.Write(code)
+	defer f.Close()
+	return path, nil
 }
